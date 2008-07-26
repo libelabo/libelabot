@@ -6,9 +6,9 @@ require 'open-uri'
 require 'pp'
 
 class SimpleClient < Net::IRC::Client
-  @@counter = {}
   def initialize(*args)
     super
+    @counter = {}
   end
 
   def on_rpl_welcome(m)
@@ -31,13 +31,13 @@ class SimpleClient < Net::IRC::Client
 
       if message =~ /(.*)\+\+/
         name = $1
-        unless @@counter.member? name
-          @@counter[name] = 0
+        unless @counter.member? name
+          @counter[name] = 0
         end
 
-        @@counter[name] += 1
+        @counter[name] += 1
 
-        post NOTICE, channel, "(#{name} : #{@@counter[name]})"
+        post NOTICE, channel, "(#{name} : #{@counter[name]})"
       end
     end
   end
