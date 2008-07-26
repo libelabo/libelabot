@@ -1,10 +1,12 @@
 require 'rubygems'
 require 'net/irc'
 require 'yaml'
+require 'open-uri'
 
 require 'pp'
 
 class SimpleClient < Net::IRC::Client
+  @@counter = {}
   def initialize(*args)
     super
   end
@@ -21,8 +23,22 @@ class SimpleClient < Net::IRC::Client
   def on_message(m)
     super
     channel, message = *m
-    if message =~ /Hello/
-      post NOTICE, "#libelabo", "Hello!"
+
+    if channel =~ /^#/
+      if message =~ /Hello/
+        post PRIVMSG, channel, "Hello!"
+      end
+
+      if message =~ /(.*)\+\+/
+        name = $1
+        unless @@counter.member? name
+          @@counter[name] = 0
+        end
+
+        @@counter[name] += 1
+
+        post NOTICE, channel, "(#{name} : #{@@counter[name]})"
+      end
     end
   end
 end
