@@ -32,7 +32,6 @@ class SimpleClient < Net::IRC::Client
 
       if message =~ /((<\w+.*?>|[^=!:'"\/]|^)((?:http[s]?:\/\/)|(?:www\.))([^\s<]+\/?)([[:punct:]]|\s|<|$))/
         url = $1.gsub(' ', '')
-        puts "|||#{url}|||"
         response = open(url)
         doc = response.read
         content_type = response.content_type
