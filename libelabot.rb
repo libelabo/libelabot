@@ -8,7 +8,8 @@ require 'pp'
 class SimpleClient < Net::IRC::Client
   def initialize(*args)
     super
-    @counter = {}
+    @incre_counter = {}
+    @decre_counter = {}
   end
 
   def on_rpl_welcome(m)
@@ -29,15 +30,25 @@ class SimpleClient < Net::IRC::Client
         post PRIVMSG, channel, "Hello!"
       end
 
-      if message =~ /(.*)\+\+/
+      if message =~ /(.*)([+|\-]{2})/
         name = $1
-        unless @counter.member? name
-          @counter[name] = 0
+        unless @incre_counter.member? name
+          @incre_counter[name] = 0
+        end
+        unless @decre_counter.member? name
+          @decre_counter[name] = 0
         end
 
-        @counter[name] += 1
+        if $2 == "++"
+          @incre_counter[name] += 1
+        elsif $2 == "--"
+          @decre_counter[name] += 1
+        end
 
-        post NOTICE, channel, "(#{name} : #{@counter[name]})"
+        incre = @incre_counter[name].to_i
+        decre = @decre_counter[name].to_i
+        value = incre - decre
+        post NOTICE, channel, "#{name} : #{value}  (#{incre}++ #{decre}--)"
       end
     end
   end
@@ -45,10 +56,10 @@ end
 
 account = YAML::load(open('libelabo.yaml'))
 
-@client = SimpleClient.new("irc.freenode.net", "6667", {
+client = SimpleClient.new("irc.freenode.net", "6667", {
                    :nick => "libelabo",
                    :user => "libelabo",
                    :real => "libelabo",
                    :pass => account['irc'],
                  })
-@client.start
+client.start
