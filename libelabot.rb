@@ -30,6 +30,19 @@ class SimpleClient < Net::IRC::Client
         post PRIVMSG, channel, "Hello!"
       end
 
+      if message =~ /((<\w+.*?>|[^=!:'"\/]|^)((?:http[s]?:\/\/)|(?:www\.))([^\s<]+\/?)([[:punct:]]|\s|<|$))/
+        url = $1.gsub(' ', '')
+        puts "|||#{url}|||"
+        response = open(url)
+        doc = response.read
+        content_type = response.content_type
+        charset = response.charset
+        if doc =~ /<title>(.*)<\/title>/
+          title = $1
+          post NOTICE, channel, "#{title} [#{content_type},#{charset}]"
+        end
+      end
+
       if message =~ /(.*)([+|\-]{2})/
         name = $1
         unless @incre_counter.member? name
