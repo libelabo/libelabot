@@ -37,14 +37,16 @@ class SimpleClient < Net::IRC::Client
         doc = response.read
         content_type = response.content_type
         charset = response.charset
+        s = ""
         if doc =~ /<title>[\s\t\n]*(.*)[\s\t\n]*<\/title>/
-          title = $1
-          post NOTICE, channel, "#{title} [#{content_type},#{charset}]"
+          s += $1 + " "
         end
+        s += [content_type, charset].join(',')
+        post NOTICE, channel, s
       end
 
       # Increment and Decrement counter
-      if message =~ /(.*)([+|\-]{2})/
+      if message =~ /([\w\-_]+)(\+{2}|\-{2})/
         name = $1
         if $2 == "++"
           unless @incre_counter.member? name
@@ -52,7 +54,7 @@ class SimpleClient < Net::IRC::Client
           else
             @incre_counter[name] += 1
           end
-        else
+        elsif $2 == "--"
           unless @decre_counter.member? name
             @decre_counter[name] = 1
           else
