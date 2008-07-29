@@ -38,7 +38,7 @@ class SimpleClient < Net::IRC::Client
         content_type = response.content_type
         charset = response.charset
         s = ""
-        if doc =~ /<title>[\s\t\n]*(.*)[\s\t\n]*<\/title>/
+        if doc =~ /<title>\s*(.*)\s*<\/title>/
           s += $1 + " "
         end
         s += [content_type, charset].join(',')
