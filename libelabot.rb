@@ -36,7 +36,7 @@ class SimpleClient < Net::IRC::Client
         doc = response.read
         content_type = response.content_type
         charset = response.charset
-        if doc =~ /<title>(.*)<\/title>/
+        if doc =~ /<title>[\s\t\n]*(.*)[\s\t\n]*<\/title>/
           title = $1
           post NOTICE, channel, "#{title} [#{content_type},#{charset}]"
         end
