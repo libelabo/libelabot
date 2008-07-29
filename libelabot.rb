@@ -3,7 +3,7 @@ require 'net/irc'
 require 'yaml'
 require 'open-uri'
 
-require 'pp'
+$KCODE = 'u'
 
 class SimpleClient < Net::IRC::Client
   def initialize(*args)
