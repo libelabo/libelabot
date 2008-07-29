@@ -46,7 +46,7 @@ class SimpleClient < Net::IRC::Client
       end
 
       # Increment and Decrement counter
-      if message =~ /([\w\-_]+)(\+{2}|\-{2})/
+      if message =~ /([\w\-_]*[\w\_])(\+{2}|\-{2})/
         name = $1
         if $2 == "++"
           unless @incre_counter.member? name
