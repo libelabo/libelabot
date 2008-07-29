@@ -30,6 +30,7 @@ class SimpleClient < Net::IRC::Client
         post PRIVMSG, channel, "Hello!"
       end
 
+      # URL title fetcher
       if message =~ /((<\w+.*?>|[^=!:'"\/]|^)((?:http[s]?:\/\/)|(?:www\.))([^\s<]+\/?)([[:punct:]]|\s|<|$))/
         url = $1.gsub(' ', '')
         response = open(url)
@@ -42,19 +43,21 @@ class SimpleClient < Net::IRC::Client
         end
       end
 
+      # Increment and Decrement counter
       if message =~ /(.*)([+|\-]{2})/
         name = $1
-        unless @incre_counter.member? name
-          @incre_counter[name] = 0
-        end
-        unless @decre_counter.member? name
-          @decre_counter[name] = 0
-        end
-
         if $2 == "++"
-          @incre_counter[name] += 1
-        elsif $2 == "--"
-          @decre_counter[name] += 1
+          unless @incre_counter.member? name
+            @incre_counter[name] = 1
+          else
+            @incre_counter[name] += 1
+          end
+        else
+          unless @decre_counter.member? name
+            @decre_counter[name] = 1
+          else
+            @decre_counter[name] += 1
+          end
         end
 
         incre = @incre_counter[name].to_i
