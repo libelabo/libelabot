@@ -1,1 +1,5 @@
 libelabo.yaml
+libelabot.log
+db/database.yml
+db/migrate.log
+db/libelabot.sqlite3

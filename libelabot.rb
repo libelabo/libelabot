@@ -4,13 +4,13 @@ require 'yaml'
 require 'open-uri'
 require 'kconv'
 
+require 'person'
+
 $KCODE = 'u'
 
 class SimpleClient < Net::IRC::Client
   def initialize(*args)
     super
-    @incre_counter = {}
-    @decre_counter = {}
   end
 
   def on_rpl_welcome(m)
@@ -51,24 +51,19 @@ class SimpleClient < Net::IRC::Client
       # Increment and Decrement counter
       if message =~ /([\w\-_]*[\w\_])(\+{2}|\-{2})/
         name = $1
-        if $2 == "++"
-          unless @incre_counter.member? name
-            @incre_counter[name] = 1
-          else
-            @incre_counter[name] += 1
-          end
-        elsif $2 == "--"
-          unless @decre_counter.member? name
-            @decre_counter[name] = 1
-          else
-            @decre_counter[name] += 1
-          end
+        unless person = Person.find_by_name(name)
+          person = Person.new
+          person.name = name
+          person.save
         end
 
-        incre = @incre_counter[name].to_i
-        decre = @decre_counter[name].to_i
-        value = incre - decre
-        post NOTICE, channel, "#{name} : #{value}  (#{incre}++ #{decre}--)"
+        if $2 == "++"
+          person.plusplus
+        elsif $2 == "--"
+          person.minusminus
+        end
+
+        post NOTICE, channel, person.print_score
       end
     end
   end
